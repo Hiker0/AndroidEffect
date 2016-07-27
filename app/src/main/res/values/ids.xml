@@ -1,0 +1,8 @@
+
+<resources>
+    <item name="content_container"  type="id" />
+    <item name="menu_bg_left"  type="id" />
+    <item name="menu_bg_right"  type="id" />
+    <item name="content"  type="id" />
+    <item name="menu_container"  type="id" />
+</resources>

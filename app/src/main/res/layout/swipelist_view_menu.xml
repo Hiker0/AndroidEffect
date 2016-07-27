@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.allen.androideffect.listview.swipelist.SwipeListItemMenu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="vertical" >
+    <LinearLayout 
+        android:id="@id/content_container"
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:gravity="center_vertical"
+    	android:orientation="horizontal"
+        ></LinearLayout>
+    <ImageView 
+        android:id="@id/menu_bg_left"
+        android:layout_width="900dp"
+    	android:layout_height="48dp"
+    	android:layout_gravity="left"
+    	android:scaleType="centerCrop"
+    	android:src="@drawable/sweeplist_message_tab"
+    	android:visibility="invisible"
+        />
+    <ImageView 
+        android:id="@id/menu_bg_right"
+        android:layout_width="900dp"
+    	android:layout_height="48dp"
+    	android:src="@drawable/sweeplist_call_tab"
+    	android:layout_gravity="right"
+    	android:scaleType="centerCrop"
+    	android:visibility="invisible"
+        />
+    <FrameLayout 
+        android:id="@id/menu_container"
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:orientation="horizontal"
+        ></FrameLayout>
+</com.allen.androideffect.listview.swipelist.SwipeListItemMenu>
