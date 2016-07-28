@@ -14,12 +14,13 @@ import android.widget.TextView;
 
 import com.allen.androideffect.R;
 import com.allen.androideffect.listview.circlelist.CircleListShow;
+import com.allen.androideffect.listview.layoutanimation.ListLayoutAnimation;
 import com.allen.androideffect.listview.swipelist.SwipeListActivity;
 
 import java.util.ArrayList;
 
 public class ListViewMenu extends ListActivity implements AdapterView.OnItemClickListener {
-    public final static String TAG = "ListEffect";
+    public final static String TAG = "ListViewMenu";
     private ArrayList<Class> list ;
     private ClassAdapter adapter;
 
@@ -27,8 +28,7 @@ public class ListViewMenu extends ListActivity implements AdapterView.OnItemClic
         list = new ArrayList<Class>();
         list.add(SwipeListActivity.class);
         list.add(CircleListShow.class);
-
-
+        list.add(ListLayoutAnimation.class);
     }
 
     @Override

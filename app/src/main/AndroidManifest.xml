@@ -18,6 +18,10 @@
         <activity android:name=".listview.ListViewMenu"></activity>
         <activity android:name=".listview.circlelist.CircleListShow"></activity>
         <activity android:name=".listview.swipelist.SwipeListActivity"></activity>
+        <activity android:name=".listview.layoutanimation.ListLayoutAnimation"></activity>
+        <activity android:name=".cyclerview.RecyclerViewMenu"></activity>
+        <activity android:name=".cyclerview.materializeyourapp.GridLayoutAnimiation"></activity>
+
 
     </application>
 
