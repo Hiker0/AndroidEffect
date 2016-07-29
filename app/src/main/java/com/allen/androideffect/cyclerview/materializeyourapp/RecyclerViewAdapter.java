@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.allen.androideffect.R;
+import com.allen.androideffect.cyclerview.ViewModel;
 
 import java.util.List;
 

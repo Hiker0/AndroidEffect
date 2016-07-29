@@ -13,6 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.allen.androideffect.R;
+import com.allen.androideffect.cyclerview.adapteranimation.AnimationAdaperActivity;
+import com.allen.androideffect.cyclerview.itemanimation.ItemAnimationActivity;
 import com.allen.androideffect.cyclerview.materializeyourapp.GridLayoutAnimiation;
 import com.allen.androideffect.listview.circlelist.CircleListShow;
 import com.allen.androideffect.listview.layoutanimation.ListLayoutAnimation;
@@ -28,6 +30,8 @@ public class RecyclerViewMenu extends ListActivity implements AdapterView.OnItem
     void  intList(){
         list = new ArrayList<Class>();
         list.add(GridLayoutAnimiation.class);
+        list.add(ItemAnimationActivity.class);
+        list.add(AnimationAdaperActivity.class);
     }
 
     @Override

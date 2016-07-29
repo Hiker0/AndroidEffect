@@ -29,6 +29,7 @@ import android.view.animation.GridLayoutAnimationController;
 import android.widget.Button;
 
 import com.allen.androideffect.R;
+import com.allen.androideffect.cyclerview.ViewModel;
 
 import java.util.ArrayList;
 import java.util.List;

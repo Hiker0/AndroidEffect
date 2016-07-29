@@ -21,7 +21,8 @@
         <activity android:name=".listview.layoutanimation.ListLayoutAnimation"></activity>
         <activity android:name=".cyclerview.RecyclerViewMenu"></activity>
         <activity android:name=".cyclerview.materializeyourapp.GridLayoutAnimiation"></activity>
-
+        <activity android:name=".cyclerview.itemanimation.ItemAnimationActivity"></activity>
+        <activity android:name=".cyclerview.adapteranimation.AnimationAdaperActivity"></activity>
 
     </application>
 

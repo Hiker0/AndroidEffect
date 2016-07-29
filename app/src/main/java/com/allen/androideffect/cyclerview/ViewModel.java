@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.allen.androideffect.cyclerview.materializeyourapp;
+package com.allen.androideffect.cyclerview;
 
 public class ViewModel {
     private String text;
+    private String text1;
     private int image;
 
     public ViewModel(String text, int image) {
         this. text = text;
         this.image = image;
     }
-
+    public ViewModel(String text,String text1, int image) {
+        this. text = text;
+        this. text1 = text1;
+        this.image = image;
+    }
     public String getText() {
         return text;
     }
-
+    public String getText1() {
+        return text1;
+    }
     public int getImage() {
         return image;
     }
