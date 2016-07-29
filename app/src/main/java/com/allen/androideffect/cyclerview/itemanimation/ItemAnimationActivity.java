@@ -3,6 +3,7 @@ package com.allen.androideffect.cyclerview.itemanimation;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +24,6 @@ import java.util.List;
 
 public class ItemAnimationActivity extends Activity {
     MyRecyclerAdapter adapter;
-    SlideInLeftAnimatorAdapter mAdapter;
     private static List<ViewModel> items = new ArrayList<>();
 
     static {
@@ -52,11 +52,11 @@ public class ItemAnimationActivity extends Activity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, OrientationHelper.HORIZONTAL, false);
         adapter = new MyRecyclerAdapter(this);
         recycler.setAdapter(adapter);
-        recycler.setItemAnimator(new SlideInOutBottomItemAnimator(recycler));
+        recycler.setItemAnimator(new DefaultItemAnimator());
         recycler.setLayoutManager(layoutManager);
 
-        Button showButton = (Button) this.findViewById(R.id.btn_add);
-        showButton.setOnClickListener(new View.OnClickListener() {
+        Button addButton = (Button) this.findViewById(R.id.btn_add);
+        addButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -65,9 +65,8 @@ public class ItemAnimationActivity extends Activity {
             }
         });
 
-
-        Button hideButton = (Button) this.findViewById(R.id.btn_remove);
-        hideButton.setOnClickListener(new View.OnClickListener() {
+        Button removeButton = (Button) this.findViewById(R.id.btn_remove);
+        removeButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -75,7 +74,45 @@ public class ItemAnimationActivity extends Activity {
                 removeItem(2);
             }
         });
+
+
+        Button testButton = (Button) this.findViewById(R.id.btn_test);
+        testButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                testItem();
+            }
+        });
+
     }
+
+    public int testItem() {
+        int count = items.size();
+        if(count>3) {
+            items.clear();
+            for (int i = 0; i < 3; i++) {
+                ViewModel model = new ViewModel("item add", "1x1", R.drawable.ic_launcher);
+                items.add(i, model);
+            }
+            adapter.notifyItemRangeRemoved(3,count-1);
+            adapter.notifyItemRangeChanged(0,3);
+        }else{
+            items.clear();
+            for (int i = 0; i < 10; i++) {
+                ViewModel model = new ViewModel("item add", "1x1", R.drawable.item1);
+                items.add(i, model);
+            }
+
+            adapter.notifyItemRangeChanged(0,9);
+            //adapter.notifyItemRangeChanged(count-1,9);
+        }
+
+
+        return items.size();
+    }
+
     public int addItem(int position) {
         ViewModel model = new ViewModel("item add","1x1", R.drawable.ic_launcher);
         items.add(position,model);

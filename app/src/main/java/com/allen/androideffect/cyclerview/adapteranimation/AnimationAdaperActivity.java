@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.allen.androideffect.R;
 import com.allen.androideffect.cyclerview.ViewModel;
-import com.allen.androideffect.cyclerview.itemanimation.SlideInOutBottomItemAnimator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,6 @@ public class AnimationAdaperActivity extends Activity {
     MyRecyclerAdapter adapter;
     SlideInLeftAnimatorAdapter mAdapter;
     private static List<ViewModel> items = new ArrayList<>();
-
     static {
         items.add(new ViewModel("Item1","1x1", R.drawable.item1));
         items.add(new ViewModel("Item2","1x1", R.drawable.item2));
@@ -69,8 +67,6 @@ public class AnimationAdaperActivity extends Activity {
     }
 
     class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.MyViewHolder> {
-
-
         private Context mContext;
         private LayoutInflater inflater;
 
@@ -78,7 +74,6 @@ public class AnimationAdaperActivity extends Activity {
             this.mContext = context;
             inflater = LayoutInflater.from(mContext);
         }
-
         @Override
         public int getItemCount() {
             return items.size();
@@ -111,6 +106,5 @@ public class AnimationAdaperActivity extends Activity {
             }
         }
     }
-
 }
 
