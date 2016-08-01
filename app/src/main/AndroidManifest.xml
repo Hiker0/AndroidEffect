@@ -15,16 +15,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".listview.ListViewMenu"></activity>
-        <activity android:name=".listview.circlelist.CircleListShow"></activity>
-        <activity android:name=".listview.swipelist.SwipeListActivity"></activity>
-        <activity android:name=".listview.layoutanimation.ListLayoutAnimation"></activity>
-        <activity android:name=".cyclerview.RecyclerViewMenu"></activity>
-        <activity android:name=".cyclerview.materializeyourapp.GridLayoutAnimiation"></activity>
-        <activity android:name=".cyclerview.itemanimation.ItemAnimationActivity"></activity>
-        <activity android:name=".cyclerview.adapteranimation.AnimationAdaperActivity"></activity>
-        <activity android:name=".cyclerview.refresh.SwipeRefreshLayoutActivity"></activity>
-
+        <activity android:name=".listview.ListViewMenu" />
+        <activity android:name=".listview.circlelist.CircleListShow" />
+        <activity android:name=".listview.swipelist.SwipeListActivity" />
+        <activity android:name=".listview.layoutanimation.ListLayoutAnimation" />
+        <activity android:name=".cyclerview.RecyclerViewMenu" />
+        <activity android:name=".cyclerview.materializeyourapp.GridLayoutAnimiation" />
+        <activity android:name=".cyclerview.itemanimation.ItemAnimationActivity" />
+        <activity android:name=".cyclerview.adapteranimation.AnimationAdaperActivity" />
+        <activity android:name=".cyclerview.refresh.SwipeRefreshLayoutActivity" />
+        <activity
+            android:theme="@style/Theme.AppCompat"
+            android:name=".cyclerview.design.snackbar.SnackbarActivity"
+            android:label="@string/title_activity_snackbar"></activity>
+        <activity android:name=".cyclerview.design.DesignMenu"></activity>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.allen.androideffect;
+package com.allen.androideffect.cyclerview.design;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -12,24 +12,23 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.allen.androideffect.cyclerview.RecyclerViewMenu;
-import com.allen.androideffect.cyclerview.design.DesignMenu;
-import com.allen.androideffect.listview.ListViewMenu;
+import com.allen.androideffect.R;
+import com.allen.androideffect.cyclerview.adapteranimation.AnimationAdaperActivity;
+import com.allen.androideffect.cyclerview.design.snackbar.SnackbarActivity;
+import com.allen.androideffect.cyclerview.itemanimation.ItemAnimationActivity;
+import com.allen.androideffect.cyclerview.materializeyourapp.GridLayoutAnimiation;
+import com.allen.androideffect.cyclerview.refresh.SwipeRefreshLayoutActivity;
 
 import java.util.ArrayList;
 
-public class MainMenu extends ListActivity implements AdapterView.OnItemClickListener {
-    public final static String TAG = "AndroidEffect";
+public class DesignMenu extends ListActivity implements AdapterView.OnItemClickListener {
+    public final static String TAG = "ListViewMenu";
     private ArrayList<Class> list ;
     private ClassAdapter adapter;
 
     void  intList(){
         list = new ArrayList<Class>();
-        list.add(ListViewMenu.class);
-        list.add(RecyclerViewMenu.class);
-        list.add(DesignMenu.class);
-
-
+        list.add(SnackbarActivity.class);
     }
 
     @Override
