@@ -16,6 +16,7 @@ import com.allen.androideffect.R;
 import com.allen.androideffect.cyclerview.adapteranimation.AnimationAdaperActivity;
 import com.allen.androideffect.cyclerview.itemanimation.ItemAnimationActivity;
 import com.allen.androideffect.cyclerview.materializeyourapp.GridLayoutAnimiation;
+import com.allen.androideffect.cyclerview.refresh.SwipeRefreshLayoutActivity;
 import com.allen.androideffect.listview.circlelist.CircleListShow;
 import com.allen.androideffect.listview.layoutanimation.ListLayoutAnimation;
 import com.allen.androideffect.listview.swipelist.SwipeListActivity;
@@ -32,6 +33,8 @@ public class RecyclerViewMenu extends ListActivity implements AdapterView.OnItem
         list.add(GridLayoutAnimiation.class);
         list.add(ItemAnimationActivity.class);
         list.add(AnimationAdaperActivity.class);
+        list.add(SwipeRefreshLayoutActivity.class);
+
     }
 
     @Override

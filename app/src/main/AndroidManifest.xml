@@ -23,6 +23,7 @@
         <activity android:name=".cyclerview.materializeyourapp.GridLayoutAnimiation"></activity>
         <activity android:name=".cyclerview.itemanimation.ItemAnimationActivity"></activity>
         <activity android:name=".cyclerview.adapteranimation.AnimationAdaperActivity"></activity>
+        <activity android:name=".cyclerview.refresh.SwipeRefreshLayoutActivity"></activity>
 
     </application>
 
