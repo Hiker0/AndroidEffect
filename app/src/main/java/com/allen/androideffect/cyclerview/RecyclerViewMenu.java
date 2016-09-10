@@ -13,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.allen.androideffect.R;
+import com.allen.androideffect.cyclerview.PullView.PullViewActivity;
 import com.allen.androideffect.cyclerview.adapteranimation.AnimationAdaperActivity;
 import com.allen.androideffect.cyclerview.itemanimation.ItemAnimationActivity;
 import com.allen.androideffect.cyclerview.materializeyourapp.GridLayoutAnimiation;
@@ -34,7 +35,7 @@ public class RecyclerViewMenu extends ListActivity implements AdapterView.OnItem
         list.add(ItemAnimationActivity.class);
         list.add(AnimationAdaperActivity.class);
         list.add(SwipeRefreshLayoutActivity.class);
-
+        list.add(PullViewActivity.class);
     }
 
     @Override

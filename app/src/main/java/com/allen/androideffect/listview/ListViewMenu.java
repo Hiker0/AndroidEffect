@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.allen.androideffect.R;
 import com.allen.androideffect.listview.circlelist.CircleListShow;
 import com.allen.androideffect.listview.layoutanimation.ListLayoutAnimation;
+import com.allen.androideffect.listview.pulllistview.PullListViewActivity;
 import com.allen.androideffect.listview.swipelist.SwipeListActivity;
 
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class ListViewMenu extends ListActivity implements AdapterView.OnItemClic
         list.add(SwipeListActivity.class);
         list.add(CircleListShow.class);
         list.add(ListLayoutAnimation.class);
+        list.add(PullListViewActivity.class);
     }
 
     @Override
