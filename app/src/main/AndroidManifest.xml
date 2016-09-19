@@ -26,6 +26,9 @@
         <activity android:name=".cyclerview.adapteranimation.AnimationAdaperActivity" />
         <activity android:name=".cyclerview.refresh.SwipeRefreshLayoutActivity" />
         <activity android:name=".cyclerview.PullView.PullViewActivity" />
+        <activity android:name=".custom.CustomViewMenu"/>
+        <activity android:name=".custom.HorizontalListViewShow"/>
+
         <activity
             android:theme="@style/Theme.AppCompat"
             android:name=".cyclerview.design.snackbar.SnackbarActivity"

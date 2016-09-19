@@ -1,4 +1,4 @@
-package com.allen.androideffect;
+package com.allen.androideffect.custom;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -12,24 +12,22 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.allen.androideffect.custom.CustomViewMenu;
-import com.allen.androideffect.cyclerview.RecyclerViewMenu;
-import com.allen.androideffect.cyclerview.design.DesignMenu;
-import com.allen.androideffect.listview.ListViewMenu;
+import com.allen.androideffect.R;
+import com.allen.androideffect.listview.circlelist.CircleListShow;
+import com.allen.androideffect.listview.layoutanimation.ListLayoutAnimation;
+import com.allen.androideffect.listview.pulllistview.PullListViewActivity;
+import com.allen.androideffect.listview.swipelist.SwipeListActivity;
 
 import java.util.ArrayList;
 
-public class MainMenu extends ListActivity implements AdapterView.OnItemClickListener {
-    public final static String TAG = "AndroidEffect";
+public class CustomViewMenu extends ListActivity implements AdapterView.OnItemClickListener {
+    public final static String TAG = "ListViewMenu";
     private ArrayList<Class> list ;
     private ClassAdapter adapter;
 
     void  intList(){
         list = new ArrayList<Class>();
-        list.add(ListViewMenu.class);
-        list.add(RecyclerViewMenu.class);
-        list.add(DesignMenu.class);
-        list.add(CustomViewMenu.class);
+        list.add(HorizontalListViewShow.class);
     }
 
     @Override

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.allen.androideffect.interpolator.LeCubicBezierInterpolator
+   xmlns:launcher="http://schemas.android.com/apk/res-auto"
+    launcher:startX="0.33"
+    launcher:startY="0"
+    launcher:endX="0.15"
+    launcher:endY="1.0"
+/>
