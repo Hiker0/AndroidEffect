@@ -26,6 +26,7 @@
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:visibility="invisible"
         />
     <com.allen.androideffect.custom.WidgetViewGroup
         android:layout_width="match_parent"
@@ -61,7 +62,28 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginLeft="10dp"
+            android:src="@drawable/item6"/>
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/item7"/>
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/item8"/>
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/item9"/>
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:src="@drawable/item6"/>
+
     </com.allen.androideffect.custom.WidgetViewGroup>
 </LinearLayout>

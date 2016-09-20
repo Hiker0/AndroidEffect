@@ -12,11 +12,15 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewParent;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
+
+import com.allen.androideffect.interpolator.LeCubicBezierInterpolator;
 
 /**
  * Created by Administrator on 2016/9/18.
@@ -34,9 +38,11 @@ public class WidgetViewGroup extends LinearLayout {
     private int mTouchSlop;
     private int mMinimumVelocity;
     private int mMaximumVelocity;
-    private Scroller[] mScrollers;
+    private ChildScroller[] mChildScrollers;
     private Interpolator mInterpolator;
     private ValueAnimator mValueAnimators;
+    private boolean  mLeftDirect = true;
+    private float durationScale = 1.0f * 825 / 945;
 
     public WidgetViewGroup(Context context) {
         this(context, null);
@@ -58,6 +64,7 @@ public class WidgetViewGroup extends LinearLayout {
         path.cubicTo(1 / 3f, 0, 0, 1, 1, 1);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mInterpolator = new PathInterpolator(path);
+            //mInterpolator = new LinearInterpolator();
         } else {
             mInterpolator = new DecelerateInterpolator();
         }
@@ -67,10 +74,10 @@ public class WidgetViewGroup extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         int count = getChildCount();
-        mScrollers = new Scroller[count];
+        mChildScrollers = new ChildScroller[count];
         for (int i = 0; i < count; i++) {
-            Scroller scroller = new Scroller(getContext(), mInterpolator);
-            mScrollers[i] = scroller;
+            ChildScroller scroller = new ChildScroller(getContext(), mInterpolator);
+            mChildScrollers[i] = scroller;
         }
     }
 
@@ -142,27 +149,60 @@ public class WidgetViewGroup extends LinearLayout {
     }
 
     private void scrollBy(float dx) {
-        Log.i(TAG, "dx=" + dx);
-        float scrollX = dx + mScrollX;
+        Log.i(TAG, "dx=" + dx+", mScrollX="+mScrollX);
+        int count = getChildCount();
+        float scrollX;
+//        if(!mChildScrollers[0].isScrollingInDirection(dx)) {
+//            if (dx >= 0) {
+//                scrollX = dx + getChildAt(count - 1).getTranslationX();
+//            } else {
+//                scrollX = dx + getChildAt(0).getTranslationX();
+//            }
+//        }else{
+            scrollX = dx + mScrollX;
+//        }
+
         if (scrollX > 0) {
             scrollX = 0;
         } else if (scrollX < -mScrollRange) {
             scrollX = -mScrollRange;
         }
-
         float scrollBy = scrollX - mScrollX;
         if (scrollBy == 0) {
             return;
         }
         mScrollX = scrollX;
-        int count = getChildCount();
+
         for (int i = 0; i < count; i++) {
-            View child = getChildAt(i);
-            float childTranslationX = child.getTranslationX();
-            childTranslationX += scrollBy;
-            //child.setTranslationX(childTranslationX);
-            final Scroller scroller = mScrollers[i];
+            ChildScroller scroller = mChildScrollers[i];
+            if(scrollBy < 0) {
+                scroller.start((int) getChildAt(i).getTranslationX(), (int) mScrollX, i * 33);
+            }else{
+                scroller.start((int) getChildAt(i).getTranslationX(), (int) mScrollX, (count-i-1) * 33);
+            }
         }
+        postInvalidate();
+    }
+
+    @Override
+    public void computeScroll() {
+        int count = getChildCount();
+        boolean finished = true;
+        for (int i = 0; i < count; i++) {
+            ChildScroller scroller = mChildScrollers[i];
+            if(scroller.computeScrollOffset()) {
+                int cur = scroller.getCurX();
+                if(i == 0){
+                    Log.i(TAG, "cur="+cur);
+                }
+                getChildAt(i).setTranslationX(cur);
+                finished &= false;
+            }
+        }
+        if(!finished) {
+            postInvalidate();
+        }
+
     }
 
     @Override
@@ -335,10 +375,87 @@ public class WidgetViewGroup extends LinearLayout {
         }
         return true;
     }
-    class ScrollRunnable implements Runnable {
 
+    class ChildScroller{
+        boolean mStarted = false;
+        boolean mRunning = false;
+        LeHorizontalScroller mScroller ;
+        int mStartX;
+        int mEndX;
+
+        ChildScroller(Context context, Interpolator interpolator){
+            mScroller= new LeHorizontalScroller(context, interpolator);
+        };
+        void start(int startx,int endx, int delay){
+            mStartX = startx;
+            mEndX = endx;
+
+            Log.d(TAG, "startc ="+startx+", endx="+endx);
+            int dx = mEndX-mStartX;
+            if(mScroller.isScrollingInDirection(dx) ){
+                mScroller.setFinalX(mEndX);
+            }else{
+                mScroller.startScroll(mStartX,dx, DURATION_MILS, delay);
+            }
+
+            mStarted = true;
+        }
+
+        boolean isScrollingInDirection(float xvel ){
+            return mScroller.isScrollingInDirection(xvel);
+        }
+
+        boolean computeScrollOffset(){
+            return mScroller.computeScrollOffset();
+        }
+
+        int getCurX(){
+                return mScroller.getCurrX();
+        }
+    }
+
+    class ScrollAnimator implements  ValueAnimator.AnimatorUpdateListener{
+        View mChild;
+        ValueAnimator mAnimator;
+
+        ScrollAnimator(View child, Interpolator interpolator){
+            mChild= child;
+            mAnimator = new ValueAnimator();
+            mAnimator.setDuration(DURATION_MILS);
+            mAnimator.setInterpolator(interpolator);
+            mAnimator.addUpdateListener(this);
+        }
+
+        void startAnimator(float endx, int delay){
+            float startx = mChild.getTranslationX();
+            mAnimator.setFloatValues(startx,endx);
+            mAnimator.setStartDelay(delay);
+            mAnimator.start();
+        }
+
+        void cancel(){
+            mAnimator.cancel();
+        }
+
+        float getPosition(){
+            float curValue=mChild.getTranslationX();
+            return curValue;
+        }
+
+        void reStartAnimator(float endx, int delay){
+            if(mAnimator.isStarted()){
+                mAnimator.cancel();
+            }
+            float startx = mChild.getTranslationX();
+            mAnimator.setFloatValues(startx,endx);
+            mAnimator.setStartDelay(delay);
+            mAnimator.setDuration(DURATION_MILS);
+            mAnimator.start();
+        }
         @Override
-        public void run() {
+        public void onAnimationUpdate(ValueAnimator animation) {
+            float curValue=(float)animation.getAnimatedValue();
+            mChild.setTranslationX(curValue);
 
         }
     }
