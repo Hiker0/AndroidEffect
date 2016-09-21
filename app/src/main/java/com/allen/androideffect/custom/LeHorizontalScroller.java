@@ -95,7 +95,6 @@ public class LeHorizontalScroller {
             this(context, null);
         }
 
-
         public LeHorizontalScroller(Context context, Interpolator interpolator) {
             this(context, interpolator,
                     context.getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.HONEYCOMB);
@@ -236,7 +235,7 @@ public class LeHorizontalScroller {
                             velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);
                             distanceCoef = d_inf + (t - t_inf) * velocityCoef;
                         }
-
+                        mCurrVelocity = velocityCoef * mDistance / mDuration * 1000.0f;
                         mCurrX = mStartX + Math.round(distanceCoef * (mFinalX - mStartX));
                         // Pin to mMinX <= mCurrX <= mMaxX
                         mCurrX = Math.min(mCurrX, mMaxX);
@@ -256,6 +255,67 @@ public class LeHorizontalScroller {
             return true;
         }
 
+    public boolean testFinished( int nowMils){
+        int timePassed = (int)(nowMils - mStartTime - mDelayed);
+
+        return false;
+    }
+
+
+    public int getScrollOffset( int nowMils, int count, int duration) {
+        int timePassed = (int) (nowMils - mStartTime - mDelayed);
+        if (timePassed < 0) {
+            return mStartX;
+        }
+        if (timePassed > mDuration) {
+            return mFinalX;
+        }
+        int result = mStartX;
+    }
+    /**
+     * Call this when you want to know the new location.  If it returns true,
+     * the animation is not yet finished.
+     */
+    public int getScrollOffset( int nowMils) {
+        int timePassed = (int)(nowMils - mStartTime - mDelayed);
+        if(timePassed < 0){
+            return mStartX;
+        }
+        if(timePassed > mDuration){
+            return mFinalX;
+        }
+        int result = mStartX;
+
+        if (timePassed < mDuration) {
+            switch (mMode) {
+                case SCROLL_MODE:
+                    final float x = mInterpolator.getInterpolation(timePassed * mDurationReciprocal);
+                    result = mStartX + Math.round(x * mDeltaX);
+                    break;
+                case FLING_MODE:
+                    final float t = (float) timePassed / mDuration;
+                    final int index = (int) (NB_SAMPLES * t);
+                    float distanceCoef = 1.f;
+                    float velocityCoef = 0.f;
+                    if (index < NB_SAMPLES) {
+                        final float t_inf = (float) index / NB_SAMPLES;
+                        final float t_sup = (float) (index + 1) / NB_SAMPLES;
+                        final float d_inf = SPLINE_POSITION[index];
+                        final float d_sup = SPLINE_POSITION[index + 1];
+                        velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);
+                        distanceCoef = d_inf + (t - t_inf) * velocityCoef;
+                    }
+                    result = mStartX + Math.round(distanceCoef * (mFinalX - mStartX));
+                    // Pin to mMinX <= mCurrX <= mMaxX
+                    result = Math.min(mCurrX, mMaxX);
+                    result = Math.max(mCurrX, mMinX);
+                    break;
+            }
+        } else {
+            result = mFinalX;
+        }
+        return result;
+    }
         /**
          * Start scrolling by providing a starting point and the distance to travel.
          * The scroll will use the default value of 250 milliseconds for the
@@ -297,26 +357,21 @@ public class LeHorizontalScroller {
          * depend on the initial velocity of the fling.
          *
          * @param startX Starting point of the scroll (X)
-         * @param startY Starting point of the scroll (Y)
          * @param velocityX Initial velocity of the fling (X) measured in pixels per
          *        second.
-         * @param velocityY Initial velocity of the fling (Y) measured in pixels per
-         *        second
          * @param minX Minimum X value. The scroller will not scroll past this
          *        point.
          * @param maxX Maximum X value. The scroller will not scroll past this
          *        point.
-         * @param minY Minimum Y value. The scroller will not scroll past this
-         *        point.
-         * @param maxY Maximum Y value. The scroller will not scroll past this
-         *        point.
          */
-        public void fling(int startX, int startY, int velocityX, int velocityY,
-                          int minX, int maxX, int minY, int maxY) {
+        public void fling(int startX, int velocityX,int minX, int maxX) {
+            fling(startX,  velocityX, minX, maxX, 0);
+        }
+        public void fling(int startX, int velocityX,int minX, int maxX, int delayed) {
             // Continue a scroll or fling in progress
+            mDelayed = delayed;
             if (mFlywheel && !mFinished) {
                 float oldVel = getCurrVelocity();
-
                 float dx = (float) (mFinalX - mStartX);
                 float hyp = (float) Math.abs(dx);
 
@@ -331,15 +386,13 @@ public class LeHorizontalScroller {
             mMode = FLING_MODE;
             mFinished = false;
 
-            float velocity = (float) Math.hypot(velocityX, velocityY);
+            float velocity = (float) Math.abs(velocityX);
 
             mVelocity = velocity;
             mDuration = getSplineFlingDuration(velocity);
             mStartTime = AnimationUtils.currentAnimationTimeMillis();
             mStartX = startX;
             float coeffX = velocity == 0 ? 1.0f : velocityX / velocity;
-            float coeffY = velocity == 0 ? 1.0f : velocityY / velocity;
-
             double totalDistance = getSplineFlingDistance(velocity);
             mDistance = (int) (totalDistance * Math.signum(velocity));
 

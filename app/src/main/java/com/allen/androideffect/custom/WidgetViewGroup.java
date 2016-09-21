@@ -18,6 +18,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
 import android.widget.LinearLayout;
+import android.widget.OverScroller;
 import android.widget.Scroller;
 
 import com.allen.androideffect.interpolator.LeCubicBezierInterpolator;
@@ -28,8 +29,8 @@ import com.allen.androideffect.interpolator.LeCubicBezierInterpolator;
 public class WidgetViewGroup extends LinearLayout {
     final static String TAG = "allen";
     private static final int INVALID_POINTER = -1;
-    private static final int DURATION_MILS = 200;
-    float mScrollX ;
+    private static final int DURATION_MILS = 500;
+    private int mScrollX ;
     int mScrollRange = 0;
     int mActivePointerId = 0;
     private int mLastMotionX;
@@ -38,11 +39,12 @@ public class WidgetViewGroup extends LinearLayout {
     private int mTouchSlop;
     private int mMinimumVelocity;
     private int mMaximumVelocity;
-    private ChildScroller[] mChildScrollers;
+    private LeHorizontalScroller[] mChildScrollers;
     private Interpolator mInterpolator;
     private ValueAnimator mValueAnimators;
     private boolean  mLeftDirect = true;
     private float durationScale = 1.0f * 825 / 945;
+    private boolean mFling = false;
 
     public WidgetViewGroup(Context context) {
         this(context, null);
@@ -58,7 +60,7 @@ public class WidgetViewGroup extends LinearLayout {
         mTouchSlop = configuration.getScaledTouchSlop();
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
         mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
-        mScrollX = 0.0f;
+        mScrollX = 0;
         Path path = new Path();
         path.moveTo(0.0f, 0.0f);
         path.cubicTo(1 / 3f, 0, 0, 1, 1, 1);
@@ -74,9 +76,9 @@ public class WidgetViewGroup extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         int count = getChildCount();
-        mChildScrollers = new ChildScroller[count];
+        mChildScrollers = new LeHorizontalScroller[count];
         for (int i = 0; i < count; i++) {
-            ChildScroller scroller = new ChildScroller(getContext(), mInterpolator);
+            LeHorizontalScroller scroller = new LeHorizontalScroller(getContext(), mInterpolator);
             mChildScrollers[i] = scroller;
         }
     }
@@ -146,63 +148,6 @@ public class WidgetViewGroup extends LinearLayout {
                 mVelocityTracker.clear();
             }
         }
-    }
-
-    private void scrollBy(float dx) {
-        Log.i(TAG, "dx=" + dx+", mScrollX="+mScrollX);
-        int count = getChildCount();
-        float scrollX;
-//        if(!mChildScrollers[0].isScrollingInDirection(dx)) {
-//            if (dx >= 0) {
-//                scrollX = dx + getChildAt(count - 1).getTranslationX();
-//            } else {
-//                scrollX = dx + getChildAt(0).getTranslationX();
-//            }
-//        }else{
-            scrollX = dx + mScrollX;
-//        }
-
-        if (scrollX > 0) {
-            scrollX = 0;
-        } else if (scrollX < -mScrollRange) {
-            scrollX = -mScrollRange;
-        }
-        float scrollBy = scrollX - mScrollX;
-        if (scrollBy == 0) {
-            return;
-        }
-        mScrollX = scrollX;
-
-        for (int i = 0; i < count; i++) {
-            ChildScroller scroller = mChildScrollers[i];
-            if(scrollBy < 0) {
-                scroller.start((int) getChildAt(i).getTranslationX(), (int) mScrollX, i * 33);
-            }else{
-                scroller.start((int) getChildAt(i).getTranslationX(), (int) mScrollX, (count-i-1) * 33);
-            }
-        }
-        postInvalidate();
-    }
-
-    @Override
-    public void computeScroll() {
-        int count = getChildCount();
-        boolean finished = true;
-        for (int i = 0; i < count; i++) {
-            ChildScroller scroller = mChildScrollers[i];
-            if(scroller.computeScrollOffset()) {
-                int cur = scroller.getCurX();
-                if(i == 0){
-                    Log.i(TAG, "cur="+cur);
-                }
-                getChildAt(i).setTranslationX(cur);
-                finished &= false;
-            }
-        }
-        if(!finished) {
-            postInvalidate();
-        }
-
     }
 
     @Override
@@ -334,8 +279,10 @@ public class WidgetViewGroup extends LinearLayout {
                     }
                 }
                 if (mIsBeingDragged) {
-                    scrollBy(deltaX);
                     mLastMotionX = (int) ev.getX();
+                    if(!scrollBy(deltaX)) {
+                        mVelocityTracker.clear();
+                    }
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -344,21 +291,19 @@ public class WidgetViewGroup extends LinearLayout {
                     velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                     int initialVelocity = (int) velocityTracker.getXVelocity(mActivePointerId);
 
-//                    if (getChildCount() > 0) {
-//                        if ((Math.abs(initialVelocity) > mMinimumVelocity)) {
-//                            fling(-initialVelocity);
-//                        } else {
-//                            if (mScroller.springBack(mScrollX, mScrollY, 0,
-//                                    getScrollRange(), 0, 0)) {
+                    if ((Math.abs(initialVelocity) > mMinimumVelocity)) {
+                        fling(initialVelocity);
+                    } else {
+//                            if (mScroller.springBack(mScrollX, 0, 0,
+//                                    mScrollRange, 0, 0)) {
 //                                postInvalidateOnAnimation();
 //                            }
-//                        }
-//                    }
-
+                    }
                     mActivePointerId = INVALID_POINTER;
                     mIsBeingDragged = false;
                     recycleVelocityTracker();
                 }
+                break;
             case MotionEvent.ACTION_CANCEL:
                 if (mIsBeingDragged && getChildCount() > 0) {
 //                    if (mScroller.springBack(mScrollX, mScrollY, 0, getScrollRange(), 0, 0)) {
@@ -376,27 +321,110 @@ public class WidgetViewGroup extends LinearLayout {
         return true;
     }
 
+
+    private boolean scrollBy(int dx) {
+        Log.i(TAG, "dx=" + dx+", mScrollX="+mScrollX);
+        int count = getChildCount();
+        int scrollX;
+        scrollX = dx + mScrollX;
+
+        if (scrollX > 0) {
+            scrollX = 0;
+        } else if ( Math.abs(scrollX) > mScrollRange) {
+            scrollX = -mScrollRange;
+        }
+        float scrollBy = scrollX - mScrollX;
+        if (scrollBy == 0) {
+            return false;
+        }
+        mScrollX = scrollX;
+        for (int i = 0; i < count; i++) {
+            getChildAt(i).setTranslationX(mScrollX);
+        }
+//        int delay = 0;
+//        if(Math.abs(scrollBy) < 6){
+//            delay = (int)Math.abs(scrollBy*scrollBy);
+//        }
+//        for (int i = 0; i < count; i++) {
+//            ChildScroller scroller = mChildScrollers[i];
+//            if(scrollBy < 0) {
+//                scroller.start((int) getChildAt(i).getTranslationX(), (int) mScrollX, i * delay);
+//            }else{
+//                scroller.start((int) getChildAt(i).getTranslationX(), (int) mScrollX, (count-i-1) * delay);
+//            }
+//        }
+        postInvalidateOnAnimation();
+        return true;
+    }
+
+    public void fling(int velocityX) {
+        int count = getChildCount();
+        mFling = true;
+        for (int i = 0; i < count; i++) {
+            LeHorizontalScroller scroller = mChildScrollers[i];
+            if(velocityX < 0) {
+                scroller.fling(mScrollX, velocityX, -mScrollRange,
+                        0,i*33);
+            }else{
+                scroller.fling(mScrollX, velocityX, -mScrollRange,
+                        0,(count-i-1)*33);
+            }
+        }
+        postInvalidateOnAnimation();
+    }
+
+    @Override
+    public void computeScroll() {
+        int count = getChildCount();
+        boolean finished = true;
+        for (int i = 0; i < count; i++) {
+            LeHorizontalScroller scroller = mChildScrollers[i];
+            if (scroller.computeScrollOffset()) {
+                scroller.getCurrVelocity();
+                int x = scroller.getCurrX();
+                finished = false;
+                getChildAt(i).setTranslationX(x);
+            }
+        }
+        if(!finished) {
+            postInvalidateOnAnimation();
+        }else{
+            mFling = false;
+        }
+
+    }
     class ChildScroller{
         boolean mStarted = false;
-        boolean mRunning = false;
         LeHorizontalScroller mScroller ;
         int mStartX;
         int mEndX;
+        int mId;
 
-        ChildScroller(Context context, Interpolator interpolator){
+        ChildScroller(Context context, Interpolator interpolator,int id){
             mScroller= new LeHorizontalScroller(context, interpolator);
+            mId = id;
         };
         void start(int startx,int endx, int delay){
             mStartX = startx;
             mEndX = endx;
-
-            Log.d(TAG, "startc ="+startx+", endx="+endx);
             int dx = mEndX-mStartX;
+
             if(mScroller.isScrollingInDirection(dx) ){
                 mScroller.setFinalX(mEndX);
             }else{
-                mScroller.startScroll(mStartX,dx, DURATION_MILS, delay);
+                mScroller.startScroll(mStartX,dx, DURATION_MILS, 20);
             }
+
+//            int duration =(int) (1.0f * Math.abs(dx) * 825/945);
+//            if(mScroller.isScrollingInDirection(dx) ){
+//                int extend = mScroller.timePassed() + duration - mScroller.getDuration();
+//                        mScroller.setFinalX(mEndX);
+//                if (extend > 0) {
+//                        mScroller.extendDuration(extend);
+//                }
+//            }else{
+//                mScroller.startScroll(mStartX,dx, duration, delay);
+//            }
 
             mStarted = true;
         }
@@ -410,58 +438,9 @@ public class WidgetViewGroup extends LinearLayout {
         }
 
         int getCurX(){
-                return mScroller.getCurrX();
+            int cur = mScroller.getCurrX();
+                Log.d(TAG, "id= " + mId +",cur =" + cur);
+            return cur;
         }
-    }
-
-    class ScrollAnimator implements  ValueAnimator.AnimatorUpdateListener{
-        View mChild;
-        ValueAnimator mAnimator;
-
-        ScrollAnimator(View child, Interpolator interpolator){
-            mChild= child;
-            mAnimator = new ValueAnimator();
-            mAnimator.setDuration(DURATION_MILS);
-            mAnimator.setInterpolator(interpolator);
-            mAnimator.addUpdateListener(this);
-        }
-
-        void startAnimator(float endx, int delay){
-            float startx = mChild.getTranslationX();
-            mAnimator.setFloatValues(startx,endx);
-            mAnimator.setStartDelay(delay);
-            mAnimator.start();
-        }
-
-        void cancel(){
-            mAnimator.cancel();
-        }
-
-        float getPosition(){
-            float curValue=mChild.getTranslationX();
-            return curValue;
-        }
-
-        void reStartAnimator(float endx, int delay){
-            if(mAnimator.isStarted()){
-                mAnimator.cancel();
-            }
-            float startx = mChild.getTranslationX();
-            mAnimator.setFloatValues(startx,endx);
-            mAnimator.setStartDelay(delay);
-            mAnimator.setDuration(DURATION_MILS);
-            mAnimator.start();
-        }
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-            float curValue=(float)animation.getAnimatedValue();
-            mChild.setTranslationX(curValue);
-
-        }
-    }
-
-    class ChildScrollInfo{
-        int mInflateX = 0;
-        int mCurentX = 0;
     }
 }
