@@ -324,6 +324,12 @@ public class WidgetViewGroup extends LinearLayout {
 
     private boolean scrollBy(int dx) {
         Log.i(TAG, "dx=" + dx+", mScrollX="+mScrollX);
+        if(mFling){
+            endfling = true;
+        }
+        if(endfling){
+            return false;
+        }
         int count = getChildCount();
         int scrollX;
         scrollX = dx + mScrollX;
@@ -353,21 +359,25 @@ public class WidgetViewGroup extends LinearLayout {
 //                scroller.start((int) getChildAt(i).getTranslationX(), (int) mScrollX, (count-i-1) * delay);
 //            }
 //        }
-        postInvalidateOnAnimation();
+//        postInvalidateOnAnimation();
         return true;
     }
 
+    int scrollstate = 0;
+    boolean endfling =false;
     public void fling(int velocityX) {
         int count = getChildCount();
         mFling = true;
         for (int i = 0; i < count; i++) {
             LeHorizontalScroller scroller = mChildScrollers[i];
             if(velocityX < 0) {
+                scrollstate = 1;
                 scroller.fling(mScrollX, velocityX, -mScrollRange,
                         0,i*33);
             }else{
                 scroller.fling(mScrollX, velocityX, -mScrollRange,
                         0,(count-i-1)*33);
+                scrollstate = 2;
             }
         }
         postInvalidateOnAnimation();
@@ -377,19 +387,30 @@ public class WidgetViewGroup extends LinearLayout {
     public void computeScroll() {
         int count = getChildCount();
         boolean finished = true;
+        if(scrollstate < 1){
+            return;
+        }
+
+        int[] curx = new int[count];
         for (int i = 0; i < count; i++) {
             LeHorizontalScroller scroller = mChildScrollers[i];
             if (scroller.computeScrollOffset()) {
-                scroller.getCurrVelocity();
-                int x = scroller.getCurrX();
+                curx[i] = scroller.getCurrX();
+                getChildAt(i).setTranslationX(curx[i]);
                 finished = false;
-                getChildAt(i).setTranslationX(x);
             }
         }
+            if(scrollstate == 1){
+                mScrollX = mChildScrollers[0].getCurrX();
+            }else if(scrollstate == 2){
+                mScrollX = mChildScrollers[count-1].getCurrX();
+            }
+
         if(!finished) {
             postInvalidateOnAnimation();
         }else{
             mFling = false;
+            endfling = false;
         }
 
     }

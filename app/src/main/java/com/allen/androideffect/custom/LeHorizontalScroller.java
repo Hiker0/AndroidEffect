@@ -254,68 +254,6 @@ public class LeHorizontalScroller {
             }
             return true;
         }
-
-    public boolean testFinished( int nowMils){
-        int timePassed = (int)(nowMils - mStartTime - mDelayed);
-
-        return false;
-    }
-
-
-    public int getScrollOffset( int nowMils, int count, int duration) {
-        int timePassed = (int) (nowMils - mStartTime - mDelayed);
-        if (timePassed < 0) {
-            return mStartX;
-        }
-        if (timePassed > mDuration) {
-            return mFinalX;
-        }
-        int result = mStartX;
-    }
-    /**
-     * Call this when you want to know the new location.  If it returns true,
-     * the animation is not yet finished.
-     */
-    public int getScrollOffset( int nowMils) {
-        int timePassed = (int)(nowMils - mStartTime - mDelayed);
-        if(timePassed < 0){
-            return mStartX;
-        }
-        if(timePassed > mDuration){
-            return mFinalX;
-        }
-        int result = mStartX;
-
-        if (timePassed < mDuration) {
-            switch (mMode) {
-                case SCROLL_MODE:
-                    final float x = mInterpolator.getInterpolation(timePassed * mDurationReciprocal);
-                    result = mStartX + Math.round(x * mDeltaX);
-                    break;
-                case FLING_MODE:
-                    final float t = (float) timePassed / mDuration;
-                    final int index = (int) (NB_SAMPLES * t);
-                    float distanceCoef = 1.f;
-                    float velocityCoef = 0.f;
-                    if (index < NB_SAMPLES) {
-                        final float t_inf = (float) index / NB_SAMPLES;
-                        final float t_sup = (float) (index + 1) / NB_SAMPLES;
-                        final float d_inf = SPLINE_POSITION[index];
-                        final float d_sup = SPLINE_POSITION[index + 1];
-                        velocityCoef = (d_sup - d_inf) / (t_sup - t_inf);
-                        distanceCoef = d_inf + (t - t_inf) * velocityCoef;
-                    }
-                    result = mStartX + Math.round(distanceCoef * (mFinalX - mStartX));
-                    // Pin to mMinX <= mCurrX <= mMaxX
-                    result = Math.min(mCurrX, mMaxX);
-                    result = Math.max(mCurrX, mMinX);
-                    break;
-            }
-        } else {
-            result = mFinalX;
-        }
-        return result;
-    }
         /**
          * Start scrolling by providing a starting point and the distance to travel.
          * The scroll will use the default value of 250 milliseconds for the
